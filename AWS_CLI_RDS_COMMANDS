@@ -1,0 +1,30 @@
+
+############## cross region read replica ####################
+aws rds create-db-instance-read-replica --db-instance-identifier <name of the replica> \
+                                        --db-instance-class db.<instance class> \
+                                        --source-db-instance-identifier <arn of source db> \
+                                        --kms-key-id <arn of kms key in the target region> \
+                                        --region <target region> \
+                                        --source-region <source db region> \
+                                        --no-publicly-accessible \
+                                        --auto-minor-version-upgrade \
+                                        --multi-az
+
+############# create RDS instance ###############
+aws rds create-db-instance --db-instance-identifier <name of instance> \
+                            --db-instance-class db.<instance class> \
+                            --engine <db engine, postgres, mysql> \
+                            --master-username username \
+                            --master-user-password 12345678 \
+                            --engine-version <engine version> \
+                            --allocated-storage 20
+
+############# check engine versions ##############
+aws rds describle-db-engine-versions --engine <engine:postgres, mysql, aurora-postgresql> | grep DBEngineVersionDescription
+
+############# execute SQL statement in Aurora Serverless ##################
+aws rds-data execute-statement --resource-arn <serverless cluster arn> \
+                                --database <database name>  \
+                                --secret-arn <arn from Secret Manager> \
+                                --sql "SELECT column_name,data_type FROM information_schema.columns WHERE table_name='table';" \
+
